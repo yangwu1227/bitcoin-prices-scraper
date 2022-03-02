@@ -1,6 +1,6 @@
 // Helper library written for useful postprocessing tasks with Flat Data
 // Has helper functions for manipulating csv, json, excel, zip, and image files
-import { readJSON, writeJSON } from 'https://deno.land/x/flat@0.0.11/mod.ts' 
+import { readJSON, writeJSON, removeFile } from 'https://deno.land/x/flat@0.0.14/mod.ts' 
 
 // Step 1: Read the downloaded_filename JSON
 // Same name as downloaded_filename `const filename = 'btc-price.json';`
