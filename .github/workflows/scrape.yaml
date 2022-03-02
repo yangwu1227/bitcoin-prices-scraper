@@ -32,3 +32,5 @@ jobs:
           http_url: https://api.coindesk.com/v2/bpi/currentprice.json
           # The http_url is saved and renamed in the repository as 'btc-price.json'
           downloaded_filename: btc-price.json
+          # A postprocessing javascript 
+          postprocess: postprocess.js 
