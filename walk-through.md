@@ -171,7 +171,7 @@ But what if you want to process or change the data in some way before it gets ad
 	
 	…
 	
-  // Or await removeFile(‘btc-price.json’)
+  	// Or await removeFile(‘btc-price.json’)
 	await removeFile(filename) 
 	```
 	
