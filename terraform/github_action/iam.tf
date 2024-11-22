@@ -41,9 +41,12 @@ resource "aws_iam_policy" "github_actions_policy" {
           "s3:PutObject",
           "s3:ListBucket",
         ],
+        # These are outputs from the s3 remote state
         "Resource" : [
-          "${data.terraform_remote_state.s3.outputs.s3_bucket_arn}",
-          "${data.terraform_remote_state.s3.outputs.s3_bucket_arn}/*"
+          "${data.terraform_remote_state.s3["dev"].outputs.s3_bucket_arn}",
+          "${data.terraform_remote_state.s3["dev"].outputs.s3_bucket_arn}/*",
+          "${data.terraform_remote_state.s3["prod"].outputs.s3_bucket_arn}",
+          "${data.terraform_remote_state.s3["prod"].outputs.s3_bucket_arn}/*"
         ]
       }
     ]
