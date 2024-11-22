@@ -37,8 +37,8 @@ jobs:
         id: setup-deno
         uses: denoland/setup-deno@v2
         with:
-          deno-version: vx.x.x
-
+          deno-version: v1.x
+          
       # The third step is a 'Flat Action' step--- we fetch the data in the 'http_url' and save it as 'downloaded_filename'
       - name: Fetch data 
         id: fetch-data
