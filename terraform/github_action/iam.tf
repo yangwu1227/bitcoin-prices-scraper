@@ -27,8 +27,8 @@ resource "aws_iam_role" "github_actions_role" {
   }
 }
 
-resource "aws_iam_policy" "github_lambda_deploy_policy" {
-  name        = "${var.project_prefix}_github_lambda_deploy_policy"
+resource "aws_iam_policy" "github_actions_policy" {
+  name        = "${var.project_prefix}_github_actions_policy"
   description = "Policy to grant least privilege access for deploying Lambda functions from GitHub Actions"
   policy = jsonencode({
     "Version" : "2012-10-17",
@@ -39,8 +39,10 @@ resource "aws_iam_policy" "github_lambda_deploy_policy" {
           # S3
           "s3:GetObject",
           "s3:PutObject",
+          "s3:ListBucket",
         ],
         "Resource" : [
+          "${data.terraform_remote_state.s3.outputs.s3_bucket_arn}",
           "${data.terraform_remote_state.s3.outputs.s3_bucket_arn}/*"
         ]
       }
@@ -50,5 +52,5 @@ resource "aws_iam_policy" "github_lambda_deploy_policy" {
 
 resource "aws_iam_role_policy_attachment" "attach_github_lambda_policy" {
   role       = aws_iam_role.github_actions_role.name
-  policy_arn = aws_iam_policy.github_lambda_deploy_policy.arn
+  policy_arn = aws_iam_policy.github_actions_policy.arn
 }
