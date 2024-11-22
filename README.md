@@ -17,7 +17,7 @@ To view the Bitcoin prices, use the following [GUI](https://flatgithub.com/yangw
 
 ### Terraform
 
-* `terraform/s3`: Creates an S3 bucket for storing the scrapper data.
+* `terraform/s3`: Creates an S3 bucket for storing the data.
 
 * `terraform/github_action`: Creates an IAM role for the GitHub Actions workflow, allowing get, put, and list operations on the s3 bucket created above.
 
