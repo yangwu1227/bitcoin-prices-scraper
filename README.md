@@ -2,7 +2,7 @@
 
 This repository automates the daily collection and storage of Bitcoin price data using GitHub Actions and Amazon S3.
 
-To view the Bitcoin prices, use the following [GUI](https://flatgithub.com/YangWu1227/flat-bitcoin-price).
+To view the Bitcoin prices, use the following [GUI](https://flatgithub.com/yangwu1227/bitcoin-prices-scraper).
 
 ## Features
 
