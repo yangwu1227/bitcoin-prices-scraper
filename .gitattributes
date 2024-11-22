@@ -1,0 +1,2 @@
+*.hcl linguist-vendored
+*.tf linguist-vendored
