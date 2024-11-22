@@ -1,4 +1,5 @@
 import polars as pl
+import os
 import pyarrow.dataset as ds
 import pyarrow as pa
 import json
@@ -7,8 +8,9 @@ from datetime import datetime
 from logging import getLogger, StreamHandler, Logger
 from typing import List, Dict
 
+ENV: str = os.environ.get("ENV", "dev")
 BITCOIN_FILE_NAME: str = "btc-price-postprocessed.json"
-S3_BUCKET: str = "bitcoin-prices-scraper"
+S3_BUCKET: str = f"bitcoin-prices-scraper-{ENV}"
 S3_KEY: str = "bitcoin-prices"
 logger: Logger = getLogger("write_data")
 logger.setLevel("INFO")
@@ -75,28 +77,27 @@ def write_to_s3(new_data: pl.DataFrame) -> None:
         )
         data: pl.DataFrame = data.sort(by=["currency", "date"])
         logger.info(f"Data appended with shape {data.shape}")
+
+        ds.write_dataset(
+            data=data.to_arrow(),
+            base_dir=s3_uri,
+            format="parquet",
+            partitioning=ds.partitioning(
+                schema=pa.schema([("currency", pa.string())]), flavor="hive"
+            ),
+            existing_data_behavior="overwrite_or_ignore",
+        )
+        logger.info(f"Saved data to {s3_uri}")
     else:
         logger.info("Data is up-to-date; no new data appended")
-
-    ds.write_dataset(
-        data=data.to_arrow(),
-        base_dir=s3_uri,
-        format="parquet",
-        partitioning=ds.partitioning(
-            schema=pa.schema([("currency", pa.string())]), flavor="hive"
-        ),
-        existing_data_behavior="overwrite_or_ignore",
-    )
-    logger.info(f"Saved data to {s3_uri}")
 
     return None
 
 
 def main() -> int:
+    logger.info(f"Running in {ENV} environment")
     new_data: pl.DataFrame = construct_data_frame()
-
     write_to_s3(new_data)
-
     return 0
 
 
