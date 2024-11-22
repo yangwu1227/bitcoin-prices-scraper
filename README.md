@@ -1,11 +1,21 @@
 # Bitcoin Prices Scraper
 
-This repository uses a [Flat Data GitHub Action](https://next.github.com/projects/flat-data/) to fetch the current price of Bitcoin from this [link](https://api.coindesk.com/v2/bpi/currentprice.json) and downloads that data to `btc-price.json` before filtering the data to create `btc-price-postprocessed.json`. Both files are updated at 12:00 p.m. (noon) every day if there are changes. 
-
-## Flat Viewer
+This repository automates the daily collection and storage of Bitcoin price data using GitHub Actions and Amazon S3.
 
 To view the Bitcoin prices, use the following [GUI](https://flatgithub.com/YangWu1227/flat-bitcoin-price).
 
-# Credit
+## Features
 
-A detailed walk-through of the steps for building this 'git scrapper' can be found [here](https://github.com/githubocto/flat-demo-bitcoin-price). The 'git scraper' approach was originated by [Simon Willison](https://simonwillison.net/2020/Oct/9/git-scraping/).
+- **Data Fetching**: Fetches Bitcoin prices daily from [CoinDesk API](https://api.coindesk.com/v2/bpi/currentprice.json).
+- **Data Processing**: Converts raw JSON data into a structured format (`btc-price-postprocessed.json`).
+- **Amazon S3 Integration**: Stores processed data in an AWS S3 bucket as partitioned parquet files ([hive-style](https://delta.io/blog/pros-cons-hive-style-partionining/)).
+
+## Automation
+
+- **Schedule**: Runs at 12:00 p.m. (noon) every day or on demand.
+- **Technologies**: Deno runtime for postprocessing, Python Polars for data management, and Terraform for infrastructure setup.
+
+## Credits
+
+- Based on [Simon Willison's Git Scraping](https://simonwillison.net/2020/Oct/9/git-scraping/).
+- Powered by [Flat Data GitHub Action](https://next.github.com/projects/flat-data/).
