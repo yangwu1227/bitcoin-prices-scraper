@@ -8,7 +8,7 @@ from logging import getLogger, StreamHandler, Logger
 from typing import List, Dict
 
 BITCOIN_FILE_NAME: str = "btc-price-postprocessed.json"
-S3_BUCKET: str = "bitcoin-price-scraper"
+S3_BUCKET: str = "bitcoin-prices-scraper"
 S3_KEY: str = "bitcoin-prices"
 logger: Logger = getLogger("write_data")
 logger.setLevel("INFO")
