@@ -48,6 +48,15 @@ async function deleteFile(filename) {
 }
 
 /**
+ * Converts a string to snake_case (lowercase and spaces replaced with underscores).
+ * @param {string} str - The input string.
+ * @returns {string} - The snake_case formatted string.
+ */
+function toSnakeCase(str) {
+    return str.toLowerCase().replace(/\s+/g, '_');
+}
+
+/**
  * Processes Bitcoin price data to extract relevant information.
  * @param {Object} data - The JSON data object.
  * @returns {Array} - Filtered array of currency rates.
@@ -58,8 +67,8 @@ function processCurrencyRates(data) {
     }
 
     return Object.values(data.bpi).map(rate => ({
-        currency: rate.description,
-        bitcoinRate: rate.rate,
+        currency: toSnakeCase(rate.description),
+        bitcoin_rate: rate.rate,
     }));
 }
 
