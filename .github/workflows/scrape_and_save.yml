@@ -1,0 +1,82 @@
+name: Scrape & Save to S3 (Reusable Workflow)
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+        description: 'The environment to run the workflow in (dev or prod)'
+    secrets:
+      AWS_REGION:
+        required: true
+      AWS_GITHUB_ACTIONS_ROLE_ARN:
+        required: true
+
+permissions:
+  id-token: write # Required for requesting the Json Web Token (JWT)
+  contents: write  # Required for actions/checkout and flat action write operations
+
+jobs:
+  scrape-prices:
+    runs-on: ubuntu-latest
+    steps:
+      # The first step is to check out the repository so it can read the files inside of it and do other operations
+      - name: Check out repo
+        id: checkout-code
+        uses: actions/checkout@v4
+
+      # The second step installs Deno, which is a new Javascript runtime that improves on Node, used for postprocessing later
+      - name: Setup deno
+        id: setup-deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v1.x
+          
+      # The third step is a 'Flat Action' step--- we fetch the data in the 'http_url' and save it as 'downloaded_filename'
+      - name: Fetch data 
+        id: fetch-data
+        if: ${{ github.event.inputs.environment == 'prod' }}
+        uses: githubocto/flat@mr/node16
+        with:
+          # The endpoint from which data is to be fetched at 12:00 p.m. (noon) every day
+          http_url: https://api.coindesk.com/v2/bpi/currentprice.json
+          # The http_url is saved and renamed in the repository as 'btc-price.json'
+          downloaded_filename: btc-price.json
+          # A postprocessing javascript 
+          postprocess: postprocess.js 
+
+  save-to-s3:
+    runs-on: ubuntu-latest
+    needs: scrape-prices
+    steps:
+      - name: Checkout repository
+        id: checkout-repo
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials from OIDC
+        id: configure-aws-credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          audience: sts.amazonaws.com
+          aws-region: ${{ secrets.AWS_REGION }}
+          role-to-assume: ${{ secrets.AWS_GITHUB_ACTIONS_ROLE_ARN }}
+          role-session-name: upload-to-s3
+
+      - name: Install uv
+        id: install-uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "0.5.3"
+
+      - name: Install dependencies
+        id: install-deps
+        run: |
+          uv sync --frozen 
+
+      - name: Run script
+        id: run-script
+        env:
+          ENV: ${{ inputs.environment }}
+        run: |
+          uv run python3 write_data.py

@@ -1,0 +1,29 @@
+name: Scrape & Save to S3 (Development)
+
+on:
+    push:
+      branches:
+        - main
+      paths:
+        - .github/workflows/scrape_and_save.yaml
+        - postprocess.js
+        - write_data.py
+    pull_request:
+      branches:
+        - main
+      paths:
+        - .github/workflows/scrape_and_save.yaml
+        - postprocess.js
+        - write_data.py
+    workflow_dispatch: 
+      inputs:
+        branch:
+          required: false
+          default: 'main' 
+
+jobs:
+  scrape-and-save:
+    uses: ./.github/workflows/scrape_and_save.yml
+    with:
+      environment: dev
+    secrets: inherit

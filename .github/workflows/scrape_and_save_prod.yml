@@ -1,0 +1,19 @@
+name: Scrape & Save to S3 (Production)
+
+on:
+    workflow_dispatch: 
+      inputs:
+        branch:
+          required: false
+          default: 'main'
+    schedule:
+      # Run this workflow at 12:00 p.m. (noon) every day
+      - cron: '0 12 * * *'
+
+jobs:
+  scrape-and-save:
+    if: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
+    uses: ./.github/workflows/scrape_and_save.yml
+    with:
+      environment: prod
+    secrets: inherit
