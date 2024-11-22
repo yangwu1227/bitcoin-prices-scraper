@@ -1,4 +1,5 @@
 import polars as pl
+import pyarrow.dataset as ds
 import pyarrow as pa
 import json
 from sys import stdout
@@ -77,11 +78,11 @@ def write_to_s3(new_data: pl.DataFrame) -> None:
     else:
         logger.info("Data is up-to-date; no new data appended")
 
-    pa.dataset.write_dataset(
+    ds.write_dataset(
         data=data.to_arrow(),
         base_dir=s3_uri,
         format="parquet",
-        partitioning=pa.dataset.partitioning(
+        partitioning=ds.partitioning(
             schema=pa.schema([("currency", pa.string())]), flavor="hive"
         ),
         existing_data_behavior="overwrite_or_ignore",
