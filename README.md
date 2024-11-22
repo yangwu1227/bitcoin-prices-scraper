@@ -1,4 +1,4 @@
-# Flat Bitcoin Prices
+# Bitcoin Prices Scraper
 
 This repository uses a [Flat Data GitHub Action](https://next.github.com/projects/flat-data/) to fetch the current price of Bitcoin from this [link](https://api.coindesk.com/v2/bpi/currentprice.json) and downloads that data to `btc-price.json` before filtering the data to create `btc-price-postprocessed.json`. Both files are updated at 12:00 p.m. (noon) every day if there are changes. 
 
