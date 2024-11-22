@@ -8,7 +8,7 @@ To view the Bitcoin prices, use the following [GUI](https://flatgithub.com/yangw
 
 - **Data Fetching**: Fetches Bitcoin prices daily from [CoinDesk API](https://api.coindesk.com/v2/bpi/currentprice.json).
 - **Data Processing**: Converts raw JSON data into a structured format (`btc-price-postprocessed.json`).
-- **Amazon S3 Integration**: Stores processed data in an AWS S3 bucket as partitioned parquet files ([hive-style](https://delta.io/blog/pros-cons-hive-style-partionining/)).
+- **Amazon S3 Integration**: Stores processed data in an S3 bucket as partitioned parquet files ([hive-style](https://delta.io/blog/pros-cons-hive-style-partionining/)).
 
 ## Setup
 
