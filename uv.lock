@@ -23,7 +23,7 @@ wheels = [
 ]
 
 [[package]]
-name = "bitcoin-price-scraper"
+name = "bitcoin-prices-scraper"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
