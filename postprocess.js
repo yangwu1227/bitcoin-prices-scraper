@@ -1,27 +1,92 @@
-// Helper library written for useful postprocessing tasks with Flat Data
-// Has helper functions for manipulating csv, json, excel, zip, and image files
-import { readJSON, writeJSON, removeFile } from 'https://deno.land/x/flat@0.0.14/mod.ts' 
+import {
+    readJSON,
+    writeJSON,
+    removeFile
+} from 'https://deno.land/x/flat@0.0.14/mod.ts';
 
-// Step 1: Read the downloaded_filename JSON
-// Same name as downloaded_filename `const filename = 'btc-price.json';`
-const filename = Deno.args[0]
-const json = await readJSON(filename)
-console.log(json)
+/**
+ * Reads a JSON file and returns its content.
+ * @param {string} filename - The path to the JSON file.
+ * @returns {Promise<Object>} - Parsed JSON data.
+ */
+async function readData(filename) {
+    try {
+        return await readJSON(filename);
+    } catch (error) {
+        console.error(`Failed to read file ${filename}:`, error.message);
+        throw error;
+    }
+}
 
-// Step 2: Filter specific data we want to keep and write to a new JSON file
-// Convert property values into an array
-const currencyRates = Object.values(json.bpi);
-const filteredCurrencyRates = currencyRates.map(rate => ({ 
-    currency: rate.description,
-    bitcoinRate: rate.rate
-}));
+/**
+ * Writes processed data to a new JSON file.
+ * @param {string} filename - The name of the new JSON file.
+ * @param {Array} data - The data to write.
+ */
+async function writeProcessedData(filename, data) {
+    try {
+        await writeJSON(filename, data);
+        console.log(`Data successfully written to ${filename}`);
+    } catch (error) {
+        console.error(`Failed to write file ${filename}:`, error.message);
+        throw error;
+    }
+}
 
-// Step 3. Write a new JSON file with our filtered data
-// Name of a new file to be saved
-const newFilename = `btc-price-postprocessed.json`
-// Create a new JSON file with just the Bitcoin price
-await writeJSON(newFilename, filteredCurrencyRates) 
-console.log("Wrote a post process file")
+/**
+ * Deletes the specified file.
+ * @param {string} filename - The file to delete.
+ */
+async function deleteFile(filename) {
+    try {
+        await removeFile(filename);
+        console.log(`Deleted file: ${filename}`);
+    } catch (error) {
+        console.error(`Failed to delete file ${filename}:`, error.message);
+        throw error;
+    }
+}
 
-// Delete raw data
-await removeFile(filename)
+/**
+ * Processes Bitcoin price data to extract relevant information.
+ * @param {Object} data - The JSON data object.
+ * @returns {Array} - Filtered array of currency rates.
+ */
+function processCurrencyRates(data) {
+    if (!data?.bpi) {
+        throw new Error("Invalid data format: 'bpi' property is missing.");
+    }
+
+    return Object.values(data.bpi).map(rate => ({
+        currency: rate.description,
+        bitcoinRate: rate.rate,
+    }));
+}
+
+async function main() {
+
+    // Extract filename from command-line arguments
+    const filename = Deno.args[0];
+    const outputFilename = 'btc-price-postprocessed.json';
+
+    try {
+        // Step 1: Read JSON data
+        const rawData = await readData(filename);
+
+        // Step 2: Process data
+        const processedData = processCurrencyRates(rawData);
+
+        // Step 3: Write processed data
+        await writeProcessedData(outputFilename, processedData);
+
+        // Step 4: Delete raw data file
+        await deleteFile(filename);
+    } catch (error) {
+        console.error("Error during execution:", error.message);
+        Deno.exit(1);
+    }
+}
+
+if (import.meta.main) {
+    await main();
+}
