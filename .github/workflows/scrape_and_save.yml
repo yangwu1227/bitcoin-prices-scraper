@@ -36,7 +36,7 @@ jobs:
       # The third step is a 'Flat Action' step--- we fetch the data in the 'http_url' and save it as 'downloaded_filename'
       - name: Fetch data 
         id: fetch-data
-        if: ${{ github.event.inputs.environment == 'prod' }}
+        if: ${{ inputs.environment == 'prod' }}
         uses: githubocto/flat@mr/node16
         with:
           # The endpoint from which data is to be fetched at 12:00 p.m. (noon) every day
