@@ -8,14 +8,14 @@ variable "profile" {
   description = "AWS configuration profile with AdministratorAccess permissions"
 }
 
-variable "s3_bucket" {
+variable "bucket" {
   type        = string
-  description = "Name of the S3 bucket where the Terraform state file is stored"
+  description = "Name of the S3 bucket where the dev and prod Terraform state files are stored"
 }
 
-variable "s3_key" {
+variable "key_prefix" {
   type        = string
-  description = "The S3 key where the Terraform state file is stored"
+  description = "S3 key prefix for the dev and prod Terraform state files"
 }
 
 variable "project_prefix" {

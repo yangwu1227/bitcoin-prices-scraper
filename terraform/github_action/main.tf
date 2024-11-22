@@ -13,11 +13,16 @@ provider "aws" {
   profile = var.profile
 }
 
+locals {
+  environments = ["dev", "prod"]
+}
+
 data "terraform_remote_state" "s3" {
-  backend = "s3"
+  for_each = toset(local.environments)
+  backend  = "s3"
   config = {
-    bucket  = var.s3_bucket
-    key     = var.s3_key
+    bucket  = var.bucket
+    key     = "${var.key_prefix}/${each.key}/terraform.tfstate"
     region  = var.region
     profile = var.profile
   }
