@@ -26,12 +26,12 @@ on:
 
 permissions:
   id-token: write # Required for requesting the Json Web Token (JWT)
-  contents: read  # Required for actions/checkout
+  contents: write  # Required for actions/checkout and flat action write operations
 
 jobs:
   scrape-prices:
     runs-on: ubuntu-latest
-    if: github.event_name == 'schedule'
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     steps:
       # The first step is to check out the repository so it can read the files inside of it and do other operations
       - name: Check out repo
