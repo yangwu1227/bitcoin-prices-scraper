@@ -62,35 +62,38 @@ def write_to_s3(new_data: pl.DataFrame) -> None:
     """
     s3_uri: str = f"s3://{S3_BUCKET}/{S3_KEY}"
 
-    data: pl.DataFrame = pl.scan_parquet(
+    existing_data: pl.DataFrame = pl.scan_parquet(
         f"{s3_uri}/*/*.parquet",
         hive_partitioning=True,
     ).collect()
-    logger.info(f"Read in data with shape {data.shape} from {s3_uri}")
+    logger.info(f"Read in data with shape {existing_data.shape} from {s3_uri}")
 
-    # Append new data if the latest date in the dataset is not today
-    if data["date"].dt.max() != datetime.today().date():
-        data: pl.DataFrame = data.select(new_data.columns)
-        data: pl.DataFrame = pl.concat(
-            items=[data, new_data],
-            how="vertical",
-            rechunk=True,
-        )
-        data: pl.DataFrame = data.sort(by=["currency", "date"])
-        logger.info(f"Data appended with shape {data.shape}")
+    latest_date = (
+        existing_data["date"].dt.max() if not existing_data.is_empty() else None
+    )
+    new_data_date = new_data["date"].dt.max()
+    logger.info(f"Latest date in existing data: {latest_date}")
+    logger.info(f"Latest date in new data: {new_data_date}")
 
-        ds.write_dataset(
-            data=data.to_arrow(),
-            base_dir=s3_uri,
-            format="parquet",
-            partitioning=ds.partitioning(
-                schema=pa.schema([("currency", pa.string())]), flavor="hive"
-            ),
-            existing_data_behavior="overwrite_or_ignore",
-        )
-        logger.info(f"Saved data to {s3_uri}")
-    else:
+    if latest_date == new_data_date:
         logger.info("Data is up-to-date; no new data appended")
+        return None
+
+    updated_data: pl.DataFrame = pl.concat(
+        items=[existing_data, new_data],
+        how="vertical",
+    ).sort(by=["currency", "date"])
+    logger.info(f"Data appended with shape {updated_data.shape}")
+
+    ds.write_dataset(
+        data=updated_data.to_arrow(),
+        base_dir=s3_uri,
+        format="parquet",
+        partitioning=ds.partitioning(
+            schema=pa.schema([("currency", pa.string())]), flavor="hive"
+        ),
+        existing_data_behavior="delete_matching",
+    )
 
     return None
 
