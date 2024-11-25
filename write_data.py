@@ -79,6 +79,8 @@ def write_to_s3(new_data: pl.DataFrame) -> None:
         logger.info("Data is up-to-date; no new data appended")
         return None
 
+    # Match the column orders
+    new_data = new_data.select(existing_data.columns)
     updated_data: pl.DataFrame = pl.concat(
         items=[existing_data, new_data],
         how="vertical",
