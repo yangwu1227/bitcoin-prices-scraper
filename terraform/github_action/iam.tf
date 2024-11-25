@@ -40,6 +40,7 @@ resource "aws_iam_policy" "github_actions_policy" {
           "s3:GetObject",
           "s3:PutObject",
           "s3:ListBucket",
+          "s3:DeleteObject",
         ],
         # These are outputs from the s3 remote state
         "Resource" : [
