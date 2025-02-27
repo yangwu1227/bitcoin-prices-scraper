@@ -39,6 +39,10 @@ jobs:
         run: deno run --allow-net --allow-write --allow-import=deno.land,cdn.deno.land,jspm.dev fetch_data.js
       
       # The fourth step is to commit the data back to the repository
+      - name: Set environment variables
+        id: set-env
+        run: echo "SHA_SHORT=$(git rev-parse --short $GITHUB_SHA)" >> $GITHUB_ENV
+
       - name: Commit changes
         id: commit-changes
         if: ${{ inputs.environment == 'prod' }}
