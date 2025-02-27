@@ -49,7 +49,7 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "fetch data ${{ env.SHA_SHORT }}"
-          file_pattern: 'btc-price-postporcesesd.json'
+          file_pattern: 'btc-price-postprocessed.json'
 
   save-to-s3:
     runs-on: ubuntu-latest

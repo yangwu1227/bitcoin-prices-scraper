@@ -51,7 +51,7 @@ function formatRates(data) {
 }
 
 async function main() {
-    const outputFilename = 'btc-price-postporcesesd.json';
+    const outputFilename = 'btc-price-postprocessed.json';
     try {
         // Step 1: Fetch data from CoinGecko api
         const rawData = await fetchBitcoinPrice();
