@@ -15,7 +15,7 @@ on:
 
 permissions:
   id-token: write # Required for requesting the Json Web Token (JWT)
-  contents: write  # Required for actions/checkout and flat action write operations
+  contents: write  # Required for committing the updated data to the repository
 
 jobs:
   scrape-prices:
@@ -31,20 +31,21 @@ jobs:
         id: setup-deno
         uses: denoland/setup-deno@v2
         with:
-          deno-version: v1.x
+          deno-version: v2.x
           
-      # The third step is a 'Flat Action' step--- we fetch the data in the 'http_url' and save it as 'downloaded_filename'
+      # The third step where we fetch the data and save it as a file in the repository
       - name: Fetch data 
         id: fetch-data
+        run: deno run --allow-net --allow-write --allow-import=deno.land,cdn.deno.land,jspm.dev fetch_data.js
+      
+      # The fourth step is to commit the data back to the repository
+      - name: Commit changes
+        id: commit-changes
         if: ${{ inputs.environment == 'prod' }}
-        uses: githubocto/flat@mr/node16
+        uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          # The endpoint from which data is to be fetched at 12:00 p.m. (noon) every day
-          http_url: https://api.coindesk.com/v2/bpi/currentprice.json
-          # The http_url is saved and renamed in the repository as 'btc-price.json'
-          downloaded_filename: btc-price.json
-          # A postprocessing javascript 
-          postprocess: postprocess.js 
+          commit_message: "fetch data ${{ env.SHA_SHORT }}"
+          file_pattern: 'btc-price-postporcesesd.json'
 
   save-to-s3:
     runs-on: ubuntu-latest
